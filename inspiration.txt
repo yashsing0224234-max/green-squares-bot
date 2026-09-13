@@ -968,3 +968,4 @@
 [2026-09-13 12:03:56 PM] Even a tiny push moves the needle.
 [2026-09-13 12:03:56 PM] Done is better than perfect.
 [2026-09-13 12:03:57 PM] Keep calm and commit on.
+[2026-09-13 09:21:08 PM] Read the error message. Then read it again.
