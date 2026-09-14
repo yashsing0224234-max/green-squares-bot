@@ -983,3 +983,4 @@
 [2026-09-14 05:37:17 PM] Simplicity is the ultimate sophistication.
 [2026-09-14 05:37:17 PM] Today's effort is tomorrow's foundation.
 [2026-09-14 05:37:17 PM] It's not about perfection. It's about progress.
+[2026-09-14 05:37:17 PM] Read the error message. Then read it again.
