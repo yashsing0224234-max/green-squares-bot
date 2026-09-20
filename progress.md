@@ -974,3 +974,4 @@
 [2026-09-19 09:06:47 PM] Compounding works on habits too.
 [2026-09-19 09:06:47 PM] Ship it, then make it better.
 [2026-09-19 09:06:47 PM] Push yourself, because no one else is going to do it for you.
+[2026-09-20 04:21:26 PM] Consistency is more important than intensity.
