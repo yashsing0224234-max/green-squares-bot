@@ -1003,3 +1003,4 @@
 [2026-09-21 05:46:10 PM] Read the error message. Then read it again.
 [2026-09-21 05:46:10 PM] You're one step closer to your goal.
 [2026-09-21 05:46:10 PM] The habit of showing up wins the game.
+[2026-09-21 05:46:10 PM] Done is better than perfect.
