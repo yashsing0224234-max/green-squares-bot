@@ -1,0 +1,48 @@
+name: Scheduled Repository Maintenance
+
+on:
+  schedule:
+    # Runs once per day at 14:17 UTC (7:47 PM IST)
+    - cron: "17 14 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scheduled-repository-maintenance
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update maintenance status
+        run: |
+          mkdir -p .github
+          {
+            echo "# Automated maintenance status"
+            echo
+            echo "This file is maintained automatically by GitHub Actions."
+            echo
+            echo "Last run: $(TZ=Asia/Kolkata date '+%Y-%m-%d %H:%M:%S IST')"
+          } > .github/activity-status.md
+
+      - name: Commit update
+        run: |
+          git config user.name "yashsing0224234-max"
+          git config user.email "232315740+yashsing0224234-max@users.noreply.github.com"
+
+          git add .github/activity-status.md
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: scheduled maintenance update"
+          git push
