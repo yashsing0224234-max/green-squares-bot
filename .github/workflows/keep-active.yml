@@ -21,28 +21,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Update maintenance status
-        run: |
-          mkdir -p .github
-          {
-            echo "# Automated maintenance status"
-            echo
-            echo "This file is maintained automatically by GitHub Actions."
-            echo
-            echo "Last run: $(TZ=Asia/Kolkata date '+%Y-%m-%d %H:%M:%S IST')"
-          } > .github/activity-status.md
-
-      - name: Commit update
+      - name: Create random daily commits
         run: |
           git config user.name "yashsing0224234-max"
           git config user.email "232315740+yashsing0224234-max@users.noreply.github.com"
 
-          git add .github/activity-status.md
+          mkdir -p .github
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
+          COUNT=$((8 + RANDOM % 5))
+          echo "Creating $COUNT commits today."
 
-          git commit -m "chore: scheduled maintenance update"
+          for i in $(seq 1 "$COUNT"); do
+            {
+              echo "# Automated maintenance status"
+              echo
+              echo "This file is maintained automatically by GitHub Actions."
+              echo
+              echo "Run date: $(TZ=Asia/Kolkata date '+%Y-%m-%d')"
+              echo "Commit: $i of $COUNT"
+              echo "Updated: $(TZ=Asia/Kolkata date '+%Y-%m-%d %H:%M:%S IST')"
+              echo "Nonce: $RANDOM-$RANDOM"
+            } > .github/activity-status.md
+
+            git add .github/activity-status.md
+            git commit -m "chore: maintenance update $i/$COUNT"
+          done
+
           git push
