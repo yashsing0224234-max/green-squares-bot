@@ -21,12 +21,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Create today's scheduled commits
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE_EXPR: ${{ github.event.schedule }}
         run: |
           set -euo pipefail
 
@@ -36,22 +39,22 @@ jobs:
           git pull --rebase origin main
 
           mkdir -p .github
-          STATE_FILE=".github/activity-state.log"
+          STATE_FILE=".github/activity-state.txt"
           STATUS_FILE=".github/activity-status.md"
 
           DATE=$(TZ=Asia/Kolkata date '+%Y-%m-%d')
           HOUR=$(TZ=Asia/Kolkata date '+%H')
           HASH=$(printf '%s' "$DATE" | cksum | awk '{print $1}')
 
-          # Stable random-looking daily target: 8..12 total commits.
+          # Stable daily target: 8..12 total commits.
           TARGET=$((8 + HASH % 5))
 
-          # Split the total across three daily slots.
+          # Split today's target across the three slots.
           A=$(((TARGET + 2) / 3))
           B=$((TARGET / 3))
           C=$((TARGET - A - B))
 
-          # Rotate the split by date so the slot sizes vary naturally.
+          # Rotate the split by date so slot sizes vary.
           ROT=$((HASH % 3))
           if [ "$ROT" -eq 0 ]; then
             MORNING=$A; AFTERNOON=$B; EVENING=$C
@@ -61,19 +64,42 @@ jobs:
             MORNING=$C; AFTERNOON=$A; EVENING=$B
           fi
 
-          if [ "$HOUR" -lt 13 ]; then
-            SLOT="morning"
-            COUNT=$MORNING
-          elif [ "$HOUR" -lt 19 ]; then
-            SLOT="afternoon"
-            COUNT=$AFTERNOON
+          # For scheduled runs (including reruns), use the original cron
+          # expression so a rerun cannot accidentally become a different slot.
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            case "$SCHEDULE_EXPR" in
+              "43 3 * * *")
+                SLOT="morning"
+                COUNT=$MORNING
+                ;;
+              "11 10 * * *")
+                SLOT="afternoon"
+                COUNT=$AFTERNOON
+                ;;
+              "53 15 * * *")
+                SLOT="evening"
+                COUNT=$EVENING
+                ;;
+              *)
+                echo "Unknown schedule expression: $SCHEDULE_EXPR"
+                exit 1
+                ;;
+            esac
           else
-            SLOT="evening"
-            COUNT=$EVENING
+            # Manual runs choose the current IST slot.
+            if [ "$HOUR" -lt 13 ]; then
+              SLOT="morning"
+              COUNT=$MORNING
+            elif [ "$HOUR" -lt 19 ]; then
+              SLOT="afternoon"
+              COUNT=$AFTERNOON
+            else
+              SLOT="evening"
+              COUNT=$EVENING
+            fi
           fi
 
           MARKER="$DATE $SLOT"
-
           touch "$STATE_FILE"
 
           if grep -Fxq "$MARKER" "$STATE_FILE"; then
