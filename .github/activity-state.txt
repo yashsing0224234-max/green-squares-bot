@@ -88,3 +88,4 @@
 2026-10-24 morning
 2026-10-24 afternoon
 2026-10-25 morning
+2026-10-25 afternoon
